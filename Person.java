@@ -5,10 +5,13 @@ public class Person {
     String phone;
     AccountType accountType;
 
-    Person(String name, Address address, String email, String phone, AccountType accountType){
-
+    public Person(String name, Address address, String email, String phone, AccountType accountType) {
+        this.name = name;
+        this.address = address;
+        this.email = email;
+        this.phone = phone;
+        this.accountType = accountType;
     }
-
 }
 
 class Account{
