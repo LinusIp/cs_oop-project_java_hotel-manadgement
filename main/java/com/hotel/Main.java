@@ -14,7 +14,7 @@ public class Main extends Application {
 
     @Override
     public void start(Stage stage) {
-        // --- 1. HEADER SECTION ---
+
         Image logo = new Image(getClass().getResourceAsStream("/logo.png"));
         ImageView logoView = new ImageView(logo);
         logoView.setFitWidth(120);
@@ -36,7 +36,6 @@ public class Main extends Application {
         header.setPadding(new Insets(20, 50, 20, 50));
         header.setStyle("-fx-background-color: #1A1B2E;");
 
-        // --- 2. HERO SECTION ---
         Label title = new Label("Luxury Meets Technology");
         title.setStyle("-fx-text-fill: white; -fx-font-size: 36px; -fx-font-weight: bold;");
 
@@ -60,13 +59,13 @@ public class Main extends Application {
         hero.setPadding(new Insets(50));
         hero.setStyle("-fx-background-color: #1A1B2E;");
 
-        // --- 3. ROOM SHOWCASE SECTION (Modified to include images) ---
+
         HBox roomContainer = new HBox(20);
         roomContainer.setAlignment(Pos.CENTER);
         roomContainer.setPadding(new Insets(40));
         roomContainer.setStyle("-fx-background-color: white;");
 
-        // Passing the image paths to the helper method
+
         roomContainer.getChildren().addAll(
                 createRoomCard("AI Smart Suite", "$120/night", "/room1.png"),
                 createRoomCard("Robotics Lab View", "$95/night", "/room2.png"),
@@ -82,7 +81,6 @@ public class Main extends Application {
         stage.show();
     }
 
-    // Updated Helper method to accept an image path
     private VBox createRoomCard(String name, String price, String imagePath) {
         VBox card = new VBox(10);
         card.setPadding(new Insets(15));
@@ -90,7 +88,7 @@ public class Main extends Application {
                 "-fx-effect: dropshadow(three-pass-box, rgba(0,0,0,0.1), 10, 0, 0, 5);");
         card.setPrefWidth(280);
 
-        // --- IMAGE HANDLING ---
+
         StackPane imgPlaceholder = new StackPane();
         imgPlaceholder.setPrefSize(250, 150);
         imgPlaceholder.setStyle("-fx-background-color: #f0f0f0; -fx-background-radius: 10;");
@@ -99,12 +97,12 @@ public class Main extends Application {
             Image roomImg = new Image(getClass().getResourceAsStream(imagePath));
             ImageView roomView = new ImageView(roomImg);
 
-            // This makes the image fit the card perfectly
+
             roomView.setFitWidth(250);
             roomView.setFitHeight(150);
-            roomView.setPreserveRatio(false); // Set to false to fill the 250x150 area
+            roomView.setPreserveRatio(false);
 
-            // Clip the image so it follows the rounded corners of the placeholder
+
             javafx.scene.shape.Rectangle clip = new javafx.scene.shape.Rectangle(250, 150);
             clip.setArcWidth(20);
             clip.setArcHeight(20);
@@ -112,7 +110,7 @@ public class Main extends Application {
 
             imgPlaceholder.getChildren().add(roomView);
         } catch (Exception e) {
-            // Fallback if image is missing
+
             imgPlaceholder.getChildren().add(new Label("Image Not Found"));
         }
 
@@ -124,6 +122,17 @@ public class Main extends Application {
 
         Button bookBtn = new Button("Book Now");
         bookBtn.setStyle("-fx-background-color: transparent; -fx-border-color: #ddd; -fx-border-radius: 5;");
+        bookBtn.setOnAction(e -> {
+            Stage stage1 =new Stage();
+            Label book = new Label("Order");
+            GridPane gridPane = new GridPane();
+            gridPane.add(book, 0, 0);
+
+            Scene scene = new Scene(gridPane, 600, 400);
+            stage1.setScene(scene);
+            stage1.show();
+
+        });
 
         HBox footer = new HBox(roomPrice, new Region(), bookBtn);
         HBox.setHgrow(footer.getChildren().get(1), Priority.ALWAYS);
