@@ -1,0 +1,90 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+<?import javafx.scene.image.ImageView?>
+<?import javafx.scene.image.Image?>
+
+<VBox xmlns:fx="http://javafx.com/fxml" fx:controller="org.example.controller.MainController" 
+      style="-fx-background-color: #1A1B2E;">
+    
+    <!-- Header -->
+    <HBox alignment="CENTER" spacing="15" style="-fx-background-color: #1A1B2E; -fx-padding: 20 50 20 50;">
+        <ImageView fitWidth="120" preserveRatio="true">
+            <Image url="@/logo.png"/>
+        </ImageView>
+        <Region HBox.hgrow="ALWAYS"/>
+        <Button fx:id="signInButton" text="Sign In" 
+                style="-fx-background-color: transparent; -fx-border-color: white; -fx-border-radius: 20; -fx-text-fill: white; -fx-padding: 5 20;"/>
+        <Button fx:id="signUpButton" text="Join Now" 
+                style="-fx-background-color: #4ECCA3; -fx-background-radius: 20; -fx-text-fill: white; -fx-font-weight: bold; -fx-padding: 5 20;"/>
+    </HBox>
+    
+    <!-- Hero Section -->
+    <VBox alignment="CENTER" spacing="20" style="-fx-background-color: #1A1B2E; -fx-padding: 50;">
+        <Label text="Luxury Meets Technology" 
+               style="-fx-text-fill: white; -fx-font-size: 36px; -fx-font-weight: bold;"/>
+        <Label text="The official smart-hotel of New Uzbekistan University" 
+               style="-fx-text-fill: #BDC3C7; -fx-font-size: 16px;"/>
+        
+        <!-- Search Bar -->
+        <HBox alignment="CENTER" spacing="10" maxWidth="600" 
+              style="-fx-background-color: #252A41; -fx-background-radius: 10; -fx-padding: 10;">
+            <TextField fx:id="searchCheckIn" promptText="Check-in" HBox.hgrow="ALWAYS"/>
+            <TextField fx:id="searchCheckOut" promptText="Check-out" HBox.hgrow="ALWAYS"/>
+            <Button fx:id="searchButton" text="Search Rooms" style="-fx-background-color: #ecf0f1;"/>
+        </HBox>
+    </VBox>
+    
+    <!-- Room Cards -->
+    <HBox alignment="CENTER" spacing="20" style="-fx-background-color: white; -fx-padding: 40;" VBox.vgrow="ALWAYS">
+        
+        <!-- Room 1 -->
+        <VBox spacing="10" style="-fx-background-color: white; -fx-background-radius: 15; -fx-padding: 15; -fx-effect: dropshadow(three-pass-box, rgba(0,0,0,0.1), 10, 0, 0, 5);" prefWidth="280">
+            <StackPane prefHeight="150" style="-fx-background-color: #f0f0f0; -fx-background-radius: 10;">
+                <ImageView fitWidth="250" fitHeight="150" preserveRatio="false">
+                    <Image url="@/room1.png"/>
+                </ImageView>
+            </StackPane>
+            <Label text="AI Smart Suite" style="-fx-font-weight: bold; -fx-font-size: 14px;"/>
+            <HBox alignment="CENTER">
+                <Label text="$120/night" style="-fx-text-fill: #4ECCA3; -fx-font-weight: bold;" HBox.hgrow="ALWAYS"/>
+                <Button text="Book Now" onAction="#handleRoom1Booking" 
+                        style="-fx-background-color: transparent; -fx-border-color: #ddd; -fx-border-radius: 5;"/>
+            </HBox>
+        </VBox>
+        
+        <!-- Room 2 -->
+        <VBox spacing="10" style="-fx-background-color: white; -fx-background-radius: 15; -fx-padding: 15; -fx-effect: dropshadow(three-pass-box, rgba(0,0,0,0.1), 10, 0, 0, 5);" prefWidth="280">
+            <StackPane prefHeight="150" style="-fx-background-color: #f0f0f0; -fx-background-radius: 10;">
+                <ImageView fitWidth="250" fitHeight="150" preserveRatio="false">
+                    <Image url="@/room2.png"/>
+                </ImageView>
+            </StackPane>
+            <Label text="Robotics Lab View" style="-fx-font-weight: bold; -fx-font-size: 14px;"/>
+            <HBox alignment="CENTER">
+                <Label text="$95/night" style="-fx-text-fill: #4ECCA3; -fx-font-weight: bold;" HBox.hgrow="ALWAYS"/>
+                <Button text="Book Now" onAction="#handleRoom2Booking" 
+                        style="-fx-background-color: transparent; -fx-border-color: #ddd; -fx-border-radius: 5;"/>
+            </HBox>
+        </VBox>
+        
+        <!-- Room 3 -->
+        <VBox spacing="10" style="-fx-background-color: white; -fx-background-radius: 15; -fx-padding: 15; -fx-effect: dropshadow(three-pass-box, rgba(0,0,0,0.1), 10, 0, 0, 5);" prefWidth="280">
+            <StackPane prefHeight="150" style="-fx-background-color: #f0f0f0; -fx-background-radius: 10;">
+                <ImageView fitWidth="250" fitHeight="150" preserveRatio="false">
+                    <Image url="@/room3.png"/>
+                </ImageView>
+            </StackPane>
+            <Label text="Freshman Dorm+" style="-fx-font-weight: bold; -fx-font-size: 14px;"/>
+            <HBox alignment="CENTER">
+                <Label text="$45/night" style="-fx-text-fill: #4ECCA3; -fx-font-weight: bold;" HBox.hgrow="ALWAYS"/>
+                <Button text="Book Now" onAction="#handleRoom3Booking" 
+                        style="-fx-background-color: transparent; -fx-border-color: #ddd; -fx-border-radius: 5;"/>
+            </HBox>
+        </VBox>
+        
+    </HBox>
+    
+</VBox>

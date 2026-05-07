@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+
+<VBox xmlns:fx="http://javafx.com/fxml" fx:controller="org.example.controller.SearchController"
+      spacing="15" style="-fx-padding: 30;">
+    
+    <Label text="Search Rooms" style="-fx-font-size: 22px; -fx-font-weight: bold;"/>
+    
+    <GridPane hgap="10" vgap="12">
+        <Label text="Start Date:" GridPane.columnIndex="0" GridPane.rowIndex="0"/>
+        <DatePicker fx:id="startDatePicker" GridPane.columnIndex="1" GridPane.rowIndex="0"/>
+        
+        <Label text="Duration (days):" GridPane.columnIndex="0" GridPane.rowIndex="1"/>
+        <TextField fx:id="durationField" promptText="Enter number of days" 
+                   GridPane.columnIndex="1" GridPane.rowIndex="1"/>
+        
+        <Label text="Room Style:" GridPane.columnIndex="0" GridPane.rowIndex="2"/>
+        <ComboBox fx:id="roomStyleCombo" GridPane.columnIndex="1" GridPane.rowIndex="2"/>
+        
+        <Button fx:id="searchButton" text="Search" 
+                style="-fx-background-color: #4ECCA3; -fx-text-fill: white; -fx-font-weight: bold;"
+                GridPane.columnIndex="1" GridPane.rowIndex="3"/>
+    </GridPane>
+    
+    <Separator/>
+    
+    <Label text="Search Results:" style="-fx-font-weight: bold;"/>
+    <ListView fx:id="resultsListView" prefHeight="200" VBox.vgrow="ALWAYS"/>
+    
+</VBox>

@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+
+<VBox xmlns:fx="http://javafx.com/fxml" fx:controller="org.example.controller.PaymentController"
+      spacing="15" style="-fx-padding: 30;">
+    
+    <Label text="Payment" style="-fx-font-size: 22px; -fx-font-weight: bold;"/>
+    
+    <Label fx:id="invoiceLabel" text="Total Amount: $0.0" 
+           style="-fx-font-size: 16px; -fx-font-weight: bold;"/>
+    
+    <Separator/>
+    
+    <Label text="Select Payment Method:" style="-fx-font-weight: bold;"/>
+    
+    <RadioButton fx:id="cashRadio" text="Cash Payment"/>
+    
+    <HBox spacing="10" alignment="CENTER_LEFT">
+        <Label text="Cash Tendered:"/>
+        <TextField fx:id="cashTenderedField" promptText="Enter amount"/>
+    </HBox>
+    
+    <RadioButton fx:id="creditCardRadio" text="Credit Card Payment"/>
+    
+    <HBox spacing="10" alignment="CENTER_LEFT">
+        <Label text="Name on Card:"/>
+        <TextField fx:id="cardNameField" promptText="Enter name" disable="true"/>
+    </HBox>
+    
+    <HBox spacing="10" alignment="CENTER_LEFT">
+        <Label text="Zip Code:"/>
+        <TextField fx:id="zipCodeField" promptText="Enter zip" disable="true"/>
+    </HBox>
+    
+    <Separator/>
+    
+    <Button fx:id="payButton" text="Complete Payment" 
+            style="-fx-background-color: #4ECCA3; -fx-text-fill: white; -fx-font-weight: bold; -fx-padding: 10 30;"/>
+    
+</VBox>

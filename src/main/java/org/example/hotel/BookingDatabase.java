@@ -81,4 +81,40 @@ public class BookingDatabase {
             statement.executeUpdate();
         }
     }
+
+    // Get all rooms from database
+    public static java.util.List<RoomRecord> getAllRooms() throws SQLException {
+        String sql = "SELECT room_id, room_name, price, status FROM rooms";
+        java.util.List<RoomRecord> rooms = new java.util.ArrayList<>();
+
+        try (Connection connection = DatabaseConnection.getConnection();
+             PreparedStatement statement = connection.prepareStatement(sql);
+             ResultSet resultSet = statement.executeQuery()) {
+
+            while (resultSet.next()) {
+                RoomRecord room = new RoomRecord(
+                    resultSet.getInt("room_id"),
+                    resultSet.getString("room_name"),
+                    resultSet.getDouble("price"),
+                    resultSet.getString("status")
+                );
+                rooms.add(room);
+            }
+        }
+
+        return rooms;
+    }
+
+    // Add a new room to database (for admin)
+    public static void addRoom(int roomId, String roomName, double price) throws SQLException {
+        String sql = "INSERT INTO rooms (room_id, room_name, price, status) VALUES (?, ?, ?, 'AVAILABLE')";
+
+        try (Connection connection = DatabaseConnection.getConnection();
+             PreparedStatement statement = connection.prepareStatement(sql)) {
+            statement.setInt(1, roomId);
+            statement.setString(2, roomName);
+            statement.setDouble(3, price);
+            statement.executeUpdate();
+        }
+    }
 }

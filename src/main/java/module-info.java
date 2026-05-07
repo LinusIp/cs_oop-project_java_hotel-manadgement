@@ -15,4 +15,10 @@ module superproject {
     opens org.example.registration to javafx.fxml;
     exports org.example.UI;
     opens org.example.UI to javafx.fxml;
+    exports org.example.controller;
+    opens org.example.controller to javafx.fxml;
+    exports org.example.service;
+    opens org.example.service to javafx.fxml;
+    exports org.example.demo;
+    opens org.example.demo to javafx.fxml;
 }
