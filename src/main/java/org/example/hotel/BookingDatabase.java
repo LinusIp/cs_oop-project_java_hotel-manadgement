@@ -35,16 +35,14 @@ public class BookingDatabase {
     }
 
     private static void ensureRoomExists(Connection connection, int roomId, String roomName, double roomPrice) throws SQLException {
-        String sql = "INSERT INTO rooms (room_id, room_name, price, status) " +
-                "VALUES (?, ?, ?, 'AVAILABLE') " +
-                "ON DUPLICATE KEY UPDATE room_name = ?, price = ?";
+        // SQLite syntax: INSERT OR REPLACE
+        String sql = "INSERT OR REPLACE INTO rooms (room_id, room_name, price, status) " +
+                "VALUES (?, ?, ?, 'AVAILABLE')";
 
         try (PreparedStatement statement = connection.prepareStatement(sql)) {
             statement.setInt(1, roomId);
             statement.setString(2, roomName);
             statement.setDouble(3, roomPrice);
-            statement.setString(4, roomName);
-            statement.setDouble(5, roomPrice);
             statement.executeUpdate();
         }
     }

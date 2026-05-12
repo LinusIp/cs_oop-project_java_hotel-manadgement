@@ -354,7 +354,7 @@ public class Main extends Application {
         signupStage.show();
     }
 
-    // Regular user dashboard — "Account Settings" instead of "Users"
+    // Regular user dashboard — limited access (only account settings)
     private Scene createDashboardScene(Stage mainStage, Account loggedInAccount) {
         BorderPane root = new BorderPane();
 
@@ -362,31 +362,31 @@ public class Main extends Application {
         title.setStyle("-fx-text-fill: white; -fx-font-size: 22px; -fx-font-weight: bold; " +
                 "-fx-border-color: white; -fx-border-width: 0 0 2 0; -fx-padding: 5;");
 
-        Button roomsButton = new Button("Rooms");
-        Button reservationsButton = new Button("Reservations");
         Button accountSettingsButton = new Button("Account Settings");
-        Button financialsButton = new Button("Financials");
         Button logoutButton = new Button("Log Out");
 
-        for (Button button : new Button[]{roomsButton, reservationsButton, accountSettingsButton, financialsButton, logoutButton}) {
+        for (Button button : new Button[]{accountSettingsButton, logoutButton}) {
             button.setMaxWidth(Double.MAX_VALUE);
         }
 
-        VBox sidebar = new VBox(10, title, roomsButton, reservationsButton, accountSettingsButton, financialsButton, logoutButton);
+        VBox sidebar = new VBox(10, title, accountSettingsButton, logoutButton);
         sidebar.setStyle("-fx-background-color: #2c3e50; -fx-padding: 15;");
         sidebar.setPrefWidth(180);
         root.setLeft(sidebar);
 
         Label welcome = new Label("Welcome, " + loggedInAccount.getUsername() + "!");
         welcome.setStyle("-fx-font-size: 24px; -fx-font-weight: bold;");
-        StackPane centerPane = new StackPane(welcome);
-        centerPane.setPadding(new Insets(30));
-        root.setCenter(centerPane);
+        
+        Label info = new Label("You can manage your account settings from the sidebar.\n\nTo book rooms, please use the main page.");
+        info.setStyle("-fx-font-size: 14px; -fx-text-fill: #666;");
+        
+        VBox centerContent = new VBox(20, welcome, info);
+        centerContent.setAlignment(Pos.CENTER);
+        centerContent.setPadding(new Insets(30));
+        
+        root.setCenter(centerContent);
 
-        roomsButton.setOnAction(event -> root.setCenter(createRoomsPane()));
-        reservationsButton.setOnAction(event -> root.setCenter(createReservationsPane()));
         accountSettingsButton.setOnAction(event -> root.setCenter(createAccountSettingsPane(loggedInAccount)));
-        financialsButton.setOnAction(event -> root.setCenter(createFinancialsPane()));
         logoutButton.setOnAction(event -> {
             mainStage.setScene(homeScene);
             mainStage.setTitle("NewUU Hotel");
