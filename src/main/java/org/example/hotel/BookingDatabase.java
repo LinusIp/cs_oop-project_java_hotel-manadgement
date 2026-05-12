@@ -117,4 +117,29 @@ public class BookingDatabase {
             statement.executeUpdate();
         }
     }
+
+    // Get all bookings from database
+    public static java.util.List<BookingRecord> getAllBookings() throws SQLException {
+        String sql = "SELECT booking_id, guest_name, room_id, check_in, check_out, total_price FROM bookings";
+        java.util.List<BookingRecord> bookings = new java.util.ArrayList<>();
+
+        try (Connection connection = DatabaseConnection.getConnection();
+             PreparedStatement statement = connection.prepareStatement(sql);
+             ResultSet resultSet = statement.executeQuery()) {
+
+            while (resultSet.next()) {
+                BookingRecord booking = new BookingRecord(
+                    resultSet.getInt("booking_id"),
+                    resultSet.getString("guest_name"),
+                    resultSet.getInt("room_id"),
+                    resultSet.getDate("check_in").toLocalDate(),
+                    resultSet.getDate("check_out").toLocalDate(),
+                    resultSet.getDouble("total_price")
+                );
+                bookings.add(booking);
+            }
+        }
+
+        return bookings;
+    }
 }

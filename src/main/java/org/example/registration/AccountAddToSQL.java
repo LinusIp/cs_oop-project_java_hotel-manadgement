@@ -71,4 +71,24 @@ public class AccountAddToSQL {
             }
         }
     }
+
+    public Account getAccountByUsername(String username) throws SQLException {
+        String query = "SELECT USER_ID, USERNAME, PASSWORD FROM users WHERE USERNAME = ?";
+
+        try (Connection conn = DatabaseConnection.getConnection();
+             PreparedStatement pstmt = conn.prepareStatement(query)) {
+            pstmt.setString(1, username);
+
+            try (ResultSet rs = pstmt.executeQuery()) {
+                if (rs.next()) {
+                    return new Account(
+                        rs.getInt("USER_ID"),
+                        rs.getString("USERNAME"),
+                        rs.getString("PASSWORD")
+                    );
+                }
+            }
+        }
+        return null;
+    }
 }

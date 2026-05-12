@@ -17,10 +17,11 @@ import org.example.hotel.RoomChargeRecord;
 import org.example.hotel.ServiceChargeDatabase;
 import org.example.hotel.Amenity;
 import org.example.hotel.KitchenService;
-import org.example.hotel.Server;
+import org.example.registration.Server;
 import org.example.hotel.Address;
 import org.example.registration.Account;
 import org.example.registration.AccountAddToSQL;
+import org.example.enums.AccountStatus;
 import org.example.UI.RoomCard;
 
 import java.sql.SQLException;
@@ -242,32 +243,55 @@ public class Main extends Application {
         signInButton.setStyle("-fx-background-color: #4ECCA3; -fx-text-fill: white; -fx-font-weight: bold;");
 
         signInButton.setOnAction(event -> {
-            String username = usernameField.getText().trim();
-            String password = passwordField.getText();
+            try {
+                String username = usernameField.getText().trim();
+                String password = passwordField.getText();
 
-            if (username.isEmpty() || password.isEmpty()) {
-                showAlert(Alert.AlertType.WARNING, "Please enter username and password.");
-                return;
-            }
-
-            if (username.equals("admin") && password.equals("18552007")) {
-                loginStage.close();
-                mainStage.setScene(createDashboardSceneForAdmin(mainStage));
-                mainStage.setTitle("Admin Dashboard");
-            } else {
-                try {
-                    if (accountService.isValidLogin(username, password)) {
-                        // Fetch the full Account object so we have the ID available for updates
-                        Account loggedInAccount = accountService.getAccountByUsername(username);
-                        loginStage.close();
-                        mainStage.setScene(createDashboardScene(mainStage, loggedInAccount));
-                        mainStage.setTitle("Hotel Dashboard");
-                    } else {
-                        showAlert(Alert.AlertType.WARNING, "Login failed. Check username and password.");
-                    }
-                } catch (SQLException ex) {
-                    showAlert(Alert.AlertType.ERROR, "Database error: " + ex.getMessage());
+                // Validation
+                if (username.isEmpty() || password.isEmpty()) {
+                    showAlert(Alert.AlertType.WARNING, "Please enter both username and password.");
+                    return;
                 }
+                
+                if (username.length() > 50) {
+                    showAlert(Alert.AlertType.ERROR, "Username is too long.");
+                    return;
+                }
+
+                // Admin login (hardcoded)
+                if (username.equals("admin") && password.equals("18552007")) {
+                    loginStage.close();
+                    mainStage.setScene(createDashboardSceneForAdmin(mainStage));
+                    mainStage.setTitle("Admin Dashboard");
+                } else {
+                    // Regular user login (database)
+                    try {
+                        if (accountService.isValidLogin(username, password)) {
+                            Account loggedInAccount = accountService.getAccountByUsername(username);
+                            
+                            if (loggedInAccount == null) {
+                                showAlert(Alert.AlertType.ERROR, "Account not found.");
+                                return;
+                            }
+                            
+                            loginStage.close();
+                            mainStage.setScene(createDashboardScene(mainStage, loggedInAccount));
+                            mainStage.setTitle("Hotel Dashboard - " + username);
+                        } else {
+                            showAlert(Alert.AlertType.WARNING, "Invalid username or password.\n\nPlease try again.");
+                        }
+                    } catch (SQLException ex) {
+                        showAlert(Alert.AlertType.ERROR, 
+                                 "Database Connection Error\n\n" +
+                                 "Could not connect to database: " + ex.getMessage() + "\n\n" +
+                                 "Please check your database connection.");
+                    }
+                }
+            } catch (Exception e) {
+                showAlert(Alert.AlertType.ERROR, 
+                         "Login Error\n\n" +
+                         "An unexpected error occurred: " + e.getMessage());
+                e.printStackTrace();
             }
         });
 
@@ -746,21 +770,48 @@ public class Main extends Application {
 
     // Refresh room container with rooms from SQL database
     private void refreshRoomContainer() {
-        roomContainer.getChildren().clear();
-        
         try {
-            for (RoomRecord room : BookingDatabase.getAllRooms()) {
-                VBox card = RoomCard.createRoomCard(
-                    (int) room.getPrice(),
-                    room.getRoomName(),
-                    "Room #" + room.getRoomId(),
-                    "/room" + ((room.getRoomId() % 3) + 1) + ".png",  // Cycle through room1.png, room2.png, room3.png
-                    () -> openBookingWindow(room.getRoomName(), room.getRoomId(), room.getPrice())
-                );
-                roomContainer.getChildren().add(card);
+            roomContainer.getChildren().clear();
+            
+            java.util.List<RoomRecord> rooms = BookingDatabase.getAllRooms();
+            
+            if (rooms.isEmpty()) {
+                Label noRooms = new Label("No rooms available.\n\nAdmin can create rooms from the dashboard.");
+                noRooms.setStyle("-fx-font-size: 16px; -fx-text-fill: #888;");
+                roomContainer.getChildren().add(noRooms);
+                return;
+            }
+            
+            for (RoomRecord room : rooms) {
+                try {
+                    VBox card = RoomCard.createRoomCard(
+                        (int) room.getPrice(),
+                        room.getRoomName(),
+                        "Room #" + room.getRoomId(),
+                        "/room" + ((room.getRoomId() % 3) + 1) + ".png",
+                        () -> openBookingWindow(room.getRoomName(), room.getRoomId(), room.getPrice())
+                    );
+                    roomContainer.getChildren().add(card);
+                } catch (Exception e) {
+                    System.err.println("Failed to create room card for room " + room.getRoomId() + ": " + e.getMessage());
+                    // Continue with other rooms even if one fails
+                }
             }
         } catch (SQLException e) {
-            showAlert(Alert.AlertType.ERROR, "Failed to load rooms: " + e.getMessage());
+            showAlert(Alert.AlertType.ERROR, 
+                     "Database Error\n\n" +
+                     "Failed to load rooms: " + e.getMessage() + "\n\n" +
+                     "Please check your database connection.");
+            
+            // Show error message in room container
+            Label errorLabel = new Label("Failed to load rooms from database.\n\nPlease check your connection.");
+            errorLabel.setStyle("-fx-font-size: 16px; -fx-text-fill: red;");
+            roomContainer.getChildren().add(errorLabel);
+        } catch (Exception e) {
+            showAlert(Alert.AlertType.ERROR, 
+                     "Unexpected Error\n\n" +
+                     "An error occurred while loading rooms: " + e.getMessage());
+            e.printStackTrace();
         }
     }
 
@@ -793,58 +844,99 @@ public class Main extends Application {
         cancelButton.setOnAction(e -> dialog.close());
 
         createButton.setOnAction(event -> {
-            String name = nameField.getText().trim();
-            String priceText = priceField.getText().trim();
-            String description = descField.getText().trim();
-            String imagePath = imageField.getText().trim();
-
-            // Validation
-            if (name.isEmpty()) {
-                showAlert(Alert.AlertType.ERROR, "Please enter room name.");
-                return;
-            }
-
-            if (priceText.isEmpty()) {
-                showAlert(Alert.AlertType.ERROR, "Please enter price.");
-                return;
-            }
-
-            int price;
             try {
-                price = Integer.parseInt(priceText);
-                if (price <= 0) {
-                    showAlert(Alert.AlertType.ERROR, "Price must be greater than zero.");
+                String name = nameField.getText().trim();
+                String priceText = priceField.getText().trim();
+                String description = descField.getText().trim();
+                String imagePath = imageField.getText().trim();
+
+                // Validation 1: Room name
+                if (name.isEmpty()) {
+                    showAlert(Alert.AlertType.ERROR, "Room name cannot be empty.");
+                    nameField.requestFocus();
                     return;
                 }
-            } catch (NumberFormatException e) {
-                showAlert(Alert.AlertType.ERROR, "Invalid price. Please enter a number.");
-                return;
-            }
-
-            if (description.isEmpty()) {
-                description = "No description";
-            }
-
-            if (imagePath.isEmpty()) {
-                imagePath = "/room1.png";
-            }
-
-            // Add room to SQL database
-            try {
-                BookingDatabase.addRoom(price, name, price);  // roomId auto-generated by SQL
                 
-                // Refresh the main page room container
-                refreshRoomContainer();
+                if (name.length() > 100) {
+                    showAlert(Alert.AlertType.ERROR, "Room name is too long (max 100 characters).");
+                    nameField.requestFocus();
+                    return;
+                }
 
-                showAlert(Alert.AlertType.INFORMATION, 
-                         "Room created successfully!\n\n" +
-                         "Name: " + name + "\n" +
-                         "Price: $" + price + "/night\n\n" +
-                         "The room is now visible on the main page and stored in the database.");
+                // Validation 2: Price
+                if (priceText.isEmpty()) {
+                    showAlert(Alert.AlertType.ERROR, "Price cannot be empty.");
+                    priceField.requestFocus();
+                    return;
+                }
 
-                dialog.close();
-            } catch (SQLException e) {
-                showAlert(Alert.AlertType.ERROR, "Failed to create room: " + e.getMessage());
+                int price;
+                try {
+                    price = Integer.parseInt(priceText);
+                } catch (NumberFormatException e) {
+                    showAlert(Alert.AlertType.ERROR, "Invalid price format.\n\nPlease enter a valid number (e.g., 120)");
+                    priceField.requestFocus();
+                    return;
+                }
+                
+                if (price <= 0) {
+                    showAlert(Alert.AlertType.ERROR, "Price must be greater than zero.");
+                    priceField.requestFocus();
+                    return;
+                }
+                
+                if (price > 100000) {
+                    showAlert(Alert.AlertType.ERROR, "Price is too high (max $100,000).");
+                    priceField.requestFocus();
+                    return;
+                }
+
+                // Validation 3: Description (optional, set default)
+                if (description.isEmpty()) {
+                    description = "No description provided";
+                }
+                
+                if (description.length() > 500) {
+                    showAlert(Alert.AlertType.ERROR, "Description is too long (max 500 characters).");
+                    descField.requestFocus();
+                    return;
+                }
+
+                // Validation 4: Image path (optional, set default)
+                if (imagePath.isEmpty()) {
+                    imagePath = "/room1.png";
+                }
+
+                // Add room to SQL database
+                try {
+                    BookingDatabase.addRoom(price, name, price);
+                    
+                    // Refresh the main page room container
+                    refreshRoomContainer();
+
+                    showAlert(Alert.AlertType.INFORMATION, 
+                             "✓ Room created successfully!\n\n" +
+                             "Name: " + name + "\n" +
+                             "Price: $" + price + "/night\n" +
+                             "Description: " + description + "\n\n" +
+                             "The room is now visible on the main page.");
+
+                    dialog.close();
+                    
+                } catch (SQLException e) {
+                    showAlert(Alert.AlertType.ERROR, 
+                             "Database Error\n\n" +
+                             "Failed to create room: " + e.getMessage() + "\n\n" +
+                             "Please check your database connection.");
+                }
+                
+            } catch (Exception e) {
+                // Catch any unexpected errors
+                showAlert(Alert.AlertType.ERROR, 
+                         "Unexpected Error\n\n" +
+                         "An error occurred: " + e.getMessage() + "\n\n" +
+                         "Please try again or contact support.");
+                e.printStackTrace();
             }
         });
 
